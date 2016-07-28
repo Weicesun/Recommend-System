@@ -16,3 +16,17 @@ class DataService(object):
 			result[user_download_history['user_id']] = user_download_history['download_history']
 
 		return result
+
+	@classmethod
+	def retrieve_app_info(cls, filter_dict={}):
+		result = {}
+		cursor = cls.app_info.find(filter_dict)
+		for app_info in cursor:
+			app_id = app_info['app_id']
+			title = app_info['title']
+			result[app_id] = {'title', title}
+		return result
+
+	@classmethod
+	def update_app_info(cls, filter_dict, update):
+		cls.app_info.update_one(filter_dict, update, True)

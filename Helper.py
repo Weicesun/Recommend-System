@@ -31,7 +31,9 @@ def calculate_top_5(app, user_download_history):
 	app_similarity.pop(app)
 	sorted_tups = sorted(app_similarity.items(), key = operator.itemgetter(1), reverse=True)
 	top_5_app = [sorted_tups[0][0], sorted_tups[1][0], sorted_tups[2][0], sorted_tups[3][0], sorted_tups[4][0]]
-	print("top_5_app for" + str(app) + ":\t" + str(top_5_app))
+	#print("top_5_app for" + str(app) + ":\t" + str(top_5_app))
+	DataService.update_app_info({'app_id': app}, {'$set':{'top_5_app': top_5_app}})
+
 
 
 def main():
@@ -40,7 +42,9 @@ def main():
 		DataService.init(client)
 
 		user_download_history = DataService.retrieve_user_download_history()
-		calculate_top_5('C10107104', user_download_history.values())
+		app_info = DataService.retrieve_app_info()
+		for app in app_info.keys():
+			calculate_top_5(app, user_download_history.values())
 	except Exception as e:
 		print (e)
 	finally:
