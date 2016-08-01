@@ -2,6 +2,7 @@ import math
 from DataService import DataService
 import operator
 from pymongo import MongoClient
+import time
 class Helper(object):
 	@classmethod
 	def cosine_similarity(cls, app_list1, app_list2):
@@ -34,7 +35,20 @@ def calculate_top_5(app, user_download_history):
 	#print("top_5_app for" + str(app) + ":\t" + str(top_5_app))
 	DataService.update_app_info({'app_id': app}, {'$set':{'top_5_app': top_5_app}})
 
+def urser_top_5(user, user_download_history):
+	user_similarity = {}
 
+	for apps in user_download_history:
+		usimilarity = Helper.cosine_similarity([user], apps)
+		for other_app in apps:
+			if user_similarity.has_key(other_app):
+				user_similarity[other_app] = user_similarity[other_app] + usimilarity
+			else:
+				user_similarity[other_app] = similarity
+	if not user_similarity.has_key(app):
+		return
+	user_similarity.pop(user)
+		
 
 def main():
 	try:
@@ -43,8 +57,11 @@ def main():
 
 		user_download_history = DataService.retrieve_user_download_history()
 		app_info = DataService.retrieve_app_info()
+		start = time.clock()
 		for app in app_info.keys():
 			calculate_top_5(app, user_download_history.values())
+		end = time.clock()
+		print "time elapsed by = "+ str(end - start)
 	except Exception as e:
 		print (e)
 	finally:
